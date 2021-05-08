@@ -21,7 +21,7 @@ class Program
 
         inputLeft[0] = 0.99F;
 
-        reverb.Process(inputLeft, inputLeft, outputLeft, outputRight);
+        reverb.Process(inputLeft, inputRight, outputLeft, outputRight);
 
         var format = new WaveFormat(sampleRate, 16, 2);
         using (var writer = new WaveFileWriter("test.wav", format))
