@@ -8,7 +8,6 @@ namespace AltFreeverb
     {
         private const float fixedGain = 0.015F;
         private const float scaleWet = 3F;
-        private const float scaleDry = 2F;
         private const float scaleDamp = 0.4F;
         private const float scaleRoom = 0.28F;
         private const float offsetRoom = 0.7F;
@@ -144,6 +143,18 @@ namespace AltFreeverb
             foreach (var apf in apfsR)
             {
                 apf.Process(outputRight);
+            }
+
+            // With the default settings, we can skip this part.
+            if (Math.Abs(wet1 - 1.0F) > 1.0E-3 || wet2 > 1.0E-3)
+            {
+                for (var t = 0; t < inputLeft.Length; t++)
+                {
+                    var left = outputLeft[t];
+                    var right = outputRight[t];
+                    outputLeft[t] = left * wet1 + right * wet2;
+                    outputRight[t] = right * wet1 + left * wet2;
+                }
             }
         }
 
