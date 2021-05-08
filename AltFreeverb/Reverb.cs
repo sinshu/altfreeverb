@@ -1,6 +1,8 @@
-﻿using System;
+﻿// This reverb implementation is based on Freeverb, a public domain reverb
+// implementation by Jezar at Dreampoint.
+
+using System;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace AltFreeverb
 {
@@ -155,6 +157,29 @@ namespace AltFreeverb
                     outputLeft[t] = left * wet1 + right * wet2;
                     outputRight[t] = right * wet1 + left * wet2;
                 }
+            }
+        }
+
+        public void Mute()
+        {
+            foreach (var cf in cfsL)
+            {
+                cf.Mute();
+            }
+
+            foreach (var cf in cfsR)
+            {
+                cf.Mute();
+            }
+
+            foreach (var apf in apfsL)
+            {
+                apf.Mute();
+            }
+
+            foreach (var apf in apfsR)
+            {
+                apf.Mute();
             }
         }
 
