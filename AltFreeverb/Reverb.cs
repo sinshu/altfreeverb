@@ -57,48 +57,48 @@ namespace AltFreeverb
         private float wet, wet1, wet2;
         private float width;
 
-        public Reverb(int blockSize)
+        public Reverb(int sampleRate, int blockSize)
         {
             inputBuffer = new float[blockSize];
 
             cfsL = new CombFilter[]
             {
-                new CombFilter(cfTuningL1),
-                new CombFilter(cfTuningL2),
-                new CombFilter(cfTuningL3),
-                new CombFilter(cfTuningL4),
-                new CombFilter(cfTuningL5),
-                new CombFilter(cfTuningL6),
-                new CombFilter(cfTuningL7),
-                new CombFilter(cfTuningL8)
+                new CombFilter(ScaleTuning(sampleRate, cfTuningL1)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningL2)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningL3)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningL4)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningL5)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningL6)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningL7)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningL8))
             };
 
             cfsR = new CombFilter[]
             {
-                new CombFilter(cfTuningR1),
-                new CombFilter(cfTuningR2),
-                new CombFilter(cfTuningR3),
-                new CombFilter(cfTuningR4),
-                new CombFilter(cfTuningR5),
-                new CombFilter(cfTuningR6),
-                new CombFilter(cfTuningR7),
-                new CombFilter(cfTuningR8)
+                new CombFilter(ScaleTuning(sampleRate, cfTuningR1)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningR2)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningR3)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningR4)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningR5)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningR6)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningR7)),
+                new CombFilter(ScaleTuning(sampleRate, cfTuningR8))
             };
 
             apfsL = new AllPassFilter[]
             {
-                new AllPassFilter(apfTuningL1),
-                new AllPassFilter(apfTuningL2),
-                new AllPassFilter(apfTuningL3),
-                new AllPassFilter(apfTuningL4)
+                new AllPassFilter(ScaleTuning(sampleRate, apfTuningL1)),
+                new AllPassFilter(ScaleTuning(sampleRate, apfTuningL2)),
+                new AllPassFilter(ScaleTuning(sampleRate, apfTuningL3)),
+                new AllPassFilter(ScaleTuning(sampleRate, apfTuningL4))
             };
 
             apfsR = new AllPassFilter[]
             {
-                new AllPassFilter(apfTuningR1),
-                new AllPassFilter(apfTuningR2),
-                new AllPassFilter(apfTuningR3),
-                new AllPassFilter(apfTuningR4)
+                new AllPassFilter(ScaleTuning(sampleRate, apfTuningR1)),
+                new AllPassFilter(ScaleTuning(sampleRate, apfTuningR2)),
+                new AllPassFilter(ScaleTuning(sampleRate, apfTuningR3)),
+                new AllPassFilter(ScaleTuning(sampleRate, apfTuningR4))
             };
 
             foreach (var apf in apfsL)
@@ -117,9 +117,14 @@ namespace AltFreeverb
             Width = initialWidth;
         }
 
+        private int ScaleTuning(int sampleRate, int tuning)
+        {
+            return (int)Math.Round((double)sampleRate / 44100 * tuning);
+        }
+
         public void Process(float[] inputLeft, float[] inputRight, float[] outputLeft, float[] outputRight)
         {
-            for (var t = 0; t < inputLeft.Length; t++)
+            for (var t = 0; t < inputBuffer.Length; t++)
             {
                 inputBuffer[t] = (inputLeft[t] + inputRight[t]) * gain;
             }
@@ -132,14 +137,14 @@ namespace AltFreeverb
                 cf.Process(inputBuffer, outputLeft);
             }
 
-            foreach (var cf in cfsR)
-            {
-                cf.Process(inputBuffer, outputRight);
-            }
-
             foreach (var apf in apfsL)
             {
                 apf.Process(outputLeft);
+            }
+
+            foreach (var cf in cfsR)
+            {
+                cf.Process(inputBuffer, outputRight);
             }
 
             foreach (var apf in apfsR)

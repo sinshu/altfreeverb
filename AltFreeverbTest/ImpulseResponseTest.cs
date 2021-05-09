@@ -35,7 +35,7 @@ namespace AltFreeverbTest
             var actualLeft = new float[length];
             var actualRight = new float[length];
 
-            var reverb = new Reverb(length);
+            var reverb = new Reverb(44100, length);
             reverb.Process(inputLeft, inputRight, actualLeft, actualRight);
 
             for (var t = 0; t < length; t++)
